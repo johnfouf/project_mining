@@ -61,7 +61,7 @@ select jdict('documentId', docid, 'projectId', id, 'confidenceLevel', sqroot(min
             select c1 as docid, textwindow(regexpr('\n',c2,''),10,5,1,'\d{4,7}\b') from pubs where c2 is not null
             )), grants
             WHERE regexpr('^0+(?!\.)',regexpr('(\d{3,})',middle),'') = nih_serialnumber AND (activitymatch OR administmatch)
-    ) where confidence > 0.16) group by docid,nih_serialnumber)
+    ) where confidence > 0.5) group by docid,nih_serialnumber)
 
 union all 
 
