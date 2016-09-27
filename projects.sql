@@ -54,7 +54,7 @@ select jdict('documentId', docid, 'projectId', id, 'confidenceLevel', sqroot(min
             regexpcountuniquematches(var('nihposfull'), string) as nihposfullmatch,
             regexpcountuniquematches(var('nihpositives'), string) as nihpositivematch,
             regexpcountuniquematches(var('nihnegatives'), string) as nihnegativematch,
-            docid, nih_coreprojectnum as id, nih_serialnumber, length(nih_serialnumber) as serialnumberlength, small_string, string
+            docid, id, nih_serialnumber, length(nih_serialnumber) as serialnumberlength, small_string, string
             from (
             select docid, middle, j2s(prev1, prev2, prev3, prev4, prev5, prev6, prev7, prev8, prev9, prev10, middle, next1, next2, next3, next4, next5) as string, j2s(prev9, prev10, middle) as small_string
             from ( setschema 'docid, prev1, prev2, prev3, prev4, prev5, prev6, prev7, prev8, prev9, prev10, middle, next1, next2, next3, next4, next5'
