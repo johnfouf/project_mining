@@ -3,7 +3,7 @@ drop table if exists grants;
 create temp table jsoninp as select * from stdinput();
 update jsoninp set c1=regexpr('"jsonextrainfo":"{}"',c1,'"jsonextrainfo":"{\"dossiernr\":\"\",\"NWOgebied\":\"\"}"');
 create table grants as select acronym,
-     case when fundingclass1 = "HRZZ" then grantid else normalizedacro as normalizedacro,
+     case when fundingclass1 = "HRZZ" then grantid else normalizedacro end as normalizedacro,
      case when fundingclass1="FCT" then acronym 
           when fundingclass1 = "HRZZ" then regexpr("(\d{4})$",grantid)
           else grantid end as grantid,
@@ -22,7 +22,12 @@ create table grants as select acronym,
                            where regexprmatches("::",c4))) where fundingclass1!='NIH' OR (nih_coreprojectnum!='' AND nih_activity!='' AND nih_administeringic!='' AND nih_serialnumber!='0');
 
 update grants set alias = "$a" where alias is null;
-insert into grants select acronym, normalizedacro, regexpr("\s",grantid,""), fundingclass1, fundingclass2, id, nwo_opt2, nwo_opt1, nih_orgname, nih_activity, nih_administeringic, nih_serialnumber, nih_coreprojectnum, regexpr("\s",alias,"")  from grants where fundingclass1="FWF";
+insert into grants 
+select acronym, normalizedacro, regexpr("\s",grantid,""), fundingclass1, fundingclass2, id, nwo_opt2, nwo_opt1, nih_orgname, nih_activity, nih_administeringic, nih_serialnumber, nih_coreprojectnum, regexpr("\s",alias,"")  
+from grants where fundingclass1="FWF";
+delete from grants where length(grantid)<4 and fundingclass1="FWF";
+delete from grants where cast(grantid as int) between 1950 and 2030 and fundingclass1 = "HRZZ";
+
 
 CREATE INDEX grants_index on grants (grantid,normalizedacro,acronym,fundingClass1,fundingClass2,id,nwo_opt2);
 create index grants2_index on grants(nwo_opt1,acronym,fundingClass1,fundingClass2,id,nwo_opt2);
