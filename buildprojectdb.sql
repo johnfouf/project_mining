@@ -6,7 +6,7 @@ create table grants as select acronym,
      case when fundingclass1 = "HRZZ" then grantid else normalizedacro end as normalizedacro,
      case when fundingclass1="FCT" then acronym 
           when fundingclass1 = "HRZZ" then regexpr("(\d{4})$",grantid)
-          when fundingclass1 = "SNSF" then regexpr('0{0,1}(\d{5,6})$',c10)
+          when fundingclass1 = "SNSF" then regexpr('0{0,1}(\d{5,6})$',grantid)
           else grantid end as grantid,
      fundingclass1,fundingclass2,id,c1 as nwo_opt2,c2 as nwo_opt1,
      case when c3='' then '_^' else c3 end as nih_orgname,
@@ -27,11 +27,11 @@ create table grants as select acronym,
                case when grantid="unidentified" then "" else jsplitv(c9) end
                else "" end as tarakeywords
      from 
-          (setschema 'acronym,normalizedacro,grantid,fundingclass1,fundingclass2,id,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10' 
+          (setschema 'acronym,normalizedacro,grantid,fundingclass1,fundingclass2,id,c1,c2,c3,c4,c5,c6,c7,c8,c9' 
           select case when c1 is null then "UNKNOWN" else c1 end as acronym, 
                  case when c1 is not null then regexpr("[_\s]",normalizetext(lower(c1)),"[_\s]") else "unknown" end as normalizedacro, 
                  c3 as grantid,strsplit(c4,"delimiter:::") as fundingClass,c2 as id, 
-                 jsonpath(c5,'$.NWOgebied','$.dossiernr','$.orgname', '$.activity', '$.administeringic', '$.serialnumber', '$.coreprojectnum','$.alias','$.keywords', '$.Project Number String') 
+                 jsonpath(c5,'$.NWOgebied','$.dossiernr','$.orgname', '$.activity', '$.administeringic', '$.serialnumber', '$.coreprojectnum','$.alias','$.keywords') 
                        from 
                           (select * from (setschema 'c1,c2,c3,c4,c5' select jsonpath(c1, '$.projectAcronym', '$.id' , '$.projectGrantId','$.fundingClass','$.jsonextrainfo') from jsoninp) 
                            where regexprmatches("::",c4))) where fundingclass1!='NIH' OR (nih_coreprojectnum!='' AND nih_activity!='' AND nih_administeringic!='' AND nih_serialnumber is not null AND nih_serialnumber!='0' AND nih_serialnumber!='');
